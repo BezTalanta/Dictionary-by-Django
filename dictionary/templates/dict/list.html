@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Word list{% endblock title %}
+
+{% block style %}
+<style>
+    .filter-field {
+        position: absolute;
+        margin-top: 5px;
+        margin-left: 5px;
+        border-radius: 5px;
+        display: inline-block;
+    }
+
+    .filter-field button {
+        width: 90px;
+        font-size: 14px;
+        margin-top: 5px;
+        margin-left: 2px;
+        padding: 2%;
+    }
+
+    .filter-field input {
+        width: 150px;
+        margin-top: 15px;
+        margin-left: 5px;
+        margin-bottom: 5px;
+    }
+
+    .filter-field .btn_search {
+        margin-top: 15px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        height: 30px;
+        float: right;
+    }
+
+    .plus {
+        background-color: black;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        top: 180px;
+        left: 5px;
+        color: white;
+        font-size: 40px;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .plus-text {
+        position: relative;
+        bottom: 16px;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+
+    <div class="filter-field bg-dark">
+        <form method="POST">
+            {% csrf_token %}
+            <button
+                class="btn btn-{% if hf_category %}success{% else %}secondary{% endif %}"
+                name="btn_categories"
+                style="margin-left: 5px;">
+                Categories
+            </button>
+            <button
+                class="btn btn-{% if hf_favor %}success{% else %}secondary{% endif %}"
+                name="btn_favourites">Favourites</button>
+            <button
+                class="btn btn-{% if hf_note %}success{% else %}secondary{% endif %}"
+                name="btn_notes"
+                style="margin-right: 5px;">Notes</button>
+            <br>
+            <input type="text" name="SearchField" placeholder="Search" value="{{ SearchDefault }}">
+            <button class="btn_search btn btn-primary" name="btn-search">Search</button>
+        </form>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button name="add" class="plus">
+            <div class="plus-text">+</div>
+        </button>
+    </form>
+
+    {% for word in words %}
+        <a style="text-decoration: none; color: black;" href="{{ word.get_absolute_url }}">
+            <div class="container card bg-light justify-content-center"
+                style="width: 60%; margin-top: 5px; font-size: 20px;">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <!-- html filter -->
+                        {% if hf_category %}
+                        <div class="col-1">
+                            <span class="badge badge-pill alert-primary text-dark">{{ word.category }}</span>
+                        </div>
+                        {% endif %}
+                        {% if hf_favor %}
+                        <div class="col-1">
+                            {% if word.favourite %}
+                                <img width="20px" src="https://cdn.pixabay.com/photo/2014/04/02/10/47/red-304570_1280.png">
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        <div class="col-{{ hf_english_col }}">{{ word.english|capfirst }}</div>
+                        <div class="col-{{ hf_tnscrp_col }}">[{{ word.transcription }}]</div>
+                        <div class="col-{{ hf_trnslt_col }}">{{ word.pure_translation }}</div>
+                        {% if hf_note %}
+                            <div class="col-1">
+                                {% if word.note %}
+                                    <img width="20px" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/emoji-one/44/heavy-exclamation-mark-symbol_2757.png" alt="">
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+
+{% endblock content %}

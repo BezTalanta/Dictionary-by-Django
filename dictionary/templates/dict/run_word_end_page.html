@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}
+Your result answers
+{% endblock title %}
+
+{% block style %}
+<style>
+    .good {
+        color: green;
+    }
+
+    .wrong {
+        color: red;
+    }
+
+    .item_div {
+        margin-left: 80px;
+        width: 300px;
+        border-radius: 5px;
+        margin-bottom: 3px;
+        font-size: 20px;
+    }
+
+    #right {
+        background-color: green;
+        color: white;
+    }
+
+    #bad {
+        background-color: red;
+        color: white;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="card" style="width: 500px; margin-left: 35%; margin-top: 5px; height: 600px;">
+    <div class="card-header text-center bg-light" style="font-size: 25px;">
+        <div class="good" style="display: inline;">{{ good_words_count }}</div> /
+        <div class="wrong" style="display: inline;">{{ wrong_words_count }}</div> /
+        {{ all_words_count }}
+    </div>
+    <div class="card-body" style="overflow-y: scroll;">
+            {% for item in data %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="text"
+                        name="english_word"
+                        value="{{ item.word.english }}" hidden>
+                    <button class="btn btn-{% if item.answer_status %}success{% else %}danger{% endif %}"
+                        style="width: 80%; margin-left: 10%; margin-bottom: 2px;">
+                        {{ item.word.english|capfirst }}
+                    </button>
+
+                    <!-- <div class="item_div" style="text-align: center;"
+                        id="{% if item.answer_status %}right{% else %}bad{% endif %}">
+                        {{ item.word.english }}
+                    </div> -->
+                </form>
+            {% endfor %}
+    </div>
+</div>
+<form action="." method="POST" style="margin-left: 44%; margin-top: 5px;">
+    {% csrf_token %}
+    <button class="btn btn-primary" style="width: 200px;" name="button" value="start new">
+        Start new training
+    </button>
+</form>
+{% endblock content %}

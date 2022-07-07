@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    #phrasefield {
+        width: 100%;
+        height: 50px;
+    }
+
+    .back {
+        position: absolute;
+        top: 75px;
+        left: 30%;
+        width: 100px;
+        height: 50px;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+
+<form action="{% url back_href %}">
+        <input type="submit" value="Back" class="btn btn-primary back"/>
+</form>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="card bg-dark" style="margin-left: 37%; width: 420px; margin-top: 5px;">
+        {% if err %}
+            <div class="alert-danger">
+                <div class="card-body">{{ err }}</div>
+            </div>
+        {% endif %}
+        <ul class="list-group list-group-flush" style="font-size: 20px;">
+            <li class="list-group-item">
+                Word: <br>
+                <input id="phrasefield" type="text" name="english" value="{{ word.english }}">
+            </li>
+            <li class="list-group-item">
+                Transcription: <br>
+                <input id="phrasefield" type="text"
+                    name="transcription" value="{{ word.transcription }}">
+            </li>
+            <li class="list-group-item">
+                Translation: <br>
+                <input id="phrasefield" type="text" name="translation" value="{{ word.translation }}">
+            </li>
+            <li class="list-group-item">
+                Note: <br>
+                <input id="phrasefield" type="text" name="note" value="{{ word.note }}">
+            </li>
+            <li class="list-group-item">
+                <select name="category">
+                    <option value="0" {% if word.category == '0' %}selected{% endif %}>0</option>
+                    <option value="1" {% if word.category == '1' %}selected{% endif %}>1</option>
+                    <option value="2" {% if word.category == '2' %}selected{% endif %}>2</option>
+                    <option value="3" {% if word.category == '3' %}selected{% endif %}>3</option>
+                </select>
+                <div style="float: right;">
+                    Is favourite:
+                    <input name="favourite" type="checkbox" {% if word.favourite %}checked{% endif %}>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <button class="btn btn-primary" name="Button" value="Update">Update</button>
+                <button class="btn btn-danger" style="float: right;"
+                    name="Button" value="Delete">Delete</button>
+            </li>
+        </ul>
+    </div>
+</form>
+{% endblock content %}

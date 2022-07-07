@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Result{% endblock title %}
+
+{% block style %}
+<style>
+    .main {
+        width: 40%;
+        margin-left: 30%;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="card main">
+    <div class="card-header {% if global_right %}bg-success{% else %}bg-danger{% endif %} text-center" style="font-size: 150%;">
+        Your answer is
+        {% if global_right %}
+            right
+        {% else %}
+            wrong
+        {% endif %}
+    </div>
+    <div class="card-body justify-content-center bg-light">
+        <ul class="list-group list-group-flush bg-success">
+            <li class="list-group-item bg-light">
+                Word was
+                <input type="text" name="original_word" value="{{ output|capfirst }}" readonly>
+            </li>
+            <li class="list-group-item bg-light">
+                Your answer was:
+                <input type="text" name="original_word" value="{{ input|capfirst }}" readonly>
+            </li>
+            <li class="list-group-item bg-light">
+                Pure translation:
+                <input type="text" name="original_word" value="{{ word.pure_translation|capfirst }}" readonly>
+            </li>
+            <li class="list-group-item bg-light">
+                Original translation:
+                <input type="text" name="original_word" value="{{ word.translation|capfirst }}" readonly>
+            </li>
+
+            {% if zero_map %}
+            <li class="list-group-item bg-light">
+                <div class="bg-light text-center">Zero category info</div>
+                {% for key, v in zero_map.items %}
+                    <div class="{% if v == 1 %}bg-success
+                        {% elif v == 0 and is_zero_right %}bg-primary
+                        {% else %}bg-danger
+                        {% endif %} text-center">{{ key|capfirst }}</div>
+                {% endfor %}
+            </li>
+            {% endif %}
+
+            {% if o_map %}
+            <li class="list-group-item bg-light">
+                <div class="bg-light text-center">One category info</div>
+                {% for key, v in o_map.items %}
+                    <div class="{% if v == 1 %}bg-success
+                        {% elif v == -1 %}bg-danger
+                        {% endif %} text-center">{{ key|capfirst }}</div>
+                {% endfor %}
+            </li>
+            {% endif %}
+
+            {% if n_o_map %}
+            <li class="list-group-item bg-light">
+                <div class="bg-light text-center">Negative one category info</div>
+                {% for key, v in n_o_map.items %}
+                    <div class="{% if v == 1 %}bg-success
+                        {% elif v == 0 %}bg-primary
+                        {% endif %} text-center">{{ key|capfirst }}</div>
+                {% endfor %}
+            </li>
+            {% endif %}
+
+            {% if wrong_user_input %}
+            <li class="list-group-item bg-light">
+                <div class="bg-light text-center">User input errors</div>
+                {% for word in wrong_user_input %}
+                    <div class="bg-danger text-center" id="">{{ word|capfirst }}</div>
+                {% endfor %}
+            </li>
+            {% endif %}
+            <li class="list-group-item bg-light">
+                <form method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" name="go_to_detail" value="{{ output }}">
+                        Go to detail
+                    </button>
+                    <button class="btn btn-primary" style="float: right;">
+                        Go next
+                    </button>
+                </form>
+            </li>
+        </ul>
+
+        <!-- <ul class="list-group list-group-horizontal">
+            <li class="list-group-item">
+                <form action="{% url 'detail-word' word.pk %}">
+                    <input type="text" name="back" id="" value="run" hidden>
+                    <button class="btn btn-primary">Go to detail word</button>
+                </form>
+            </li>
+            <li class="list-group-item">
+                <form action="{% url 'run' %}">
+                    <button class="btn btn-primary">Go next word</button>
+                </form>
+            </li>
+        </ul> -->
+    </div>
+</div>
+{% endblock content %}

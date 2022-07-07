@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Home page
+{% endblock title %}
+
+{% block content %}
+<h1>Hello, this is home page!</h1>
+
+<h2>
+{% if request.user.is_authenticated %}
+    Hello, {{ request.user }}, have a good day! <br>
+    <a href="{% url 'logout' %}">Logout</a>
+{% else %}
+    You are not logged in! <br>
+    <a href="{% url 'login' %}">Login</a> <br>
+    <a href="{% url 'signup' %}">Signup</a>
+{% endif %}
+</h2>
+
+<br>
+<h2><a href="{% url 'dict-list' %}">Go to dictionary</a></h2>
+<br>
+
+<h3>News will be here</h3>
+{% endblock content %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    .field {
+        margin-top: 5px;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+
+<div class="card bg-light" style="margin-left: 30%; width: 700px; margin-top: 5px;">
+    <div class="card-header bg-dark text-light">
+        <h1 style="text-align: center;">Fill fields to create a new word</h1>
+    </div>
+    <div class="card-body">
+        {% if err %}
+            <div class="card alert-danger">
+                <div class="card-body">{{ err }}</div>
+            </div>
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="field">
+                English word *: <br>
+                <input class="container-fluid" type="text" name="english" placeholder="English word here"> <br>
+            </div>
+            <div class="field">
+                Transcription: <br>
+                <input class="container-fluid" type="text" name="transcription" placeholder="Word transcription here"> <br>
+            </div>
+            <div class="field">
+                Translation *: <br>
+                <input class="container-fluid" type="text" name="translation" placeholder="Translation here"> <br>
+            </div>
+            <div class="field">
+                Word's category:
+                <select name="category">
+                    <option value="0"></option>
+                    <option value="1">✰</option>
+                    <option value="2">✰✰</option>
+                    <option value="3">✰✰✰</option>
+                </select> <br>
+            </div>
+            <div class="field">
+            Is your word in favourite area?
+            <input type="checkbox" name="is_favourite" value="Favourite"> <br>
+            </div>
+            <div class="field">
+                <input type="text" name="note" placeholder="Note if you want"> <br> <br>
+            </div>
+            <button class="btn btn-primary" type="submit" style="margin-left: 45%;">Create</button>
+
+            <div class="form-check" style="float: right; margin-top: 5px;">
+                Multiple actions? <input type="checkbox" name="multiple"
+                    {% if multiple_check %}checked{% endif %}>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

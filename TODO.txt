@@ -1,0 +1,4 @@
+TODO: Make div wider because wrong mouse clicking
+TODO: Upgrade detail view to get full notes and full translation, for example Elphant in the room
+TODO: Make more cute list view because items are not middle aligned
+TODO: Make drop down menu when u want to login, tip to you https://getbootstrap.com/docs/4.0/components/dropdowns/, close to end with "Menu forms"

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Signup a new account{% endblock title %}
+
+{% block content %}
+
+{% block style %}
+<style>
+    input {
+        float: right;
+    }
+</style>
+{% endblock style %}
+
+
+<div style="margin-top: 2%;" class="container d-flex justify-content-center">
+    <div class="card" style="width: 400px;">
+        <div class="card-header bg-dark text-light text-center">
+            Fill fields to create a new account
+        </div>
+        <div class="card-body">
+            {% if err %}<div class="alert alert-danger" role="alert">{{ err }}</div>{% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <p class="card-text">
+                    <strong>Username:</strong>
+                    <input type="text" name="username" placeholder="Username here" value="{{ username }}">
+                </p>
+                <p class="card-text">
+                <strong>Email:</strong>
+                <input type="text" name="email" placeholder="Email here" value="{{ email }}">
+                </p>
+                <p class="card-text">
+                First name:
+                <input type="text" name="first_name" placeholder="First name here"
+                    value="{{ first_name }}">
+                </p>
+                <p class="card-text">
+                Last name:
+                <input type="text" name="last_name" placeholder="Last name here"
+                    value="{{ last_name }}">
+                </p>
+                <p class="card-text">
+                <strong>Password:</strong>
+                <input type="password" name="password1" placeholder="Password here">
+                </p>
+                <p class="card-tex">
+                <strong>Password:</strong>
+                <input type="password" name="password2" placeholder="Password here again">
+                </p>
+                <button style="margin-left: 40%;" class="btn btn-primary" type="Submit">Signup</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    .o_btn {
+        margin-top: 1%;
+        height: 60px;
+        text-align: center;
+        padding-top: 15px;
+        width: 94%;
+        margin-left: 3%;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div style="width: 600px; height: 500px; margin-left: 30%;" class="card bg-light">
+    <div class="card-header bg-dark text-light"
+        style="text-align: center; height: 60px; padding-top: 2%; font-weight: bold;">
+        <div class="card-text">Click to get info about something</div>
+    </div>
+    <div class="btn btn-success o_btn">How to use this site</div>
+    <div class="btn btn-info o_btn">How does this site work</div>
+    <a href="{% url 'doc:api' %}">Api</a>
+</div>
+{% endblock content %}

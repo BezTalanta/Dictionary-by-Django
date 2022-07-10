@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}
+Test form
+{% endblock title %}
+
+{% block style %}
+<style>
+
+</style>
+{% endblock style %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        <p>{{ field.label }} {{ field }} {{ field.help_text }}
+            {% for error in field.error_messages %}
+                <br>{{ error }}
+            {% endfor %}
+        </p>
+    {% endfor %}
+    <button class="btn btn-primary">Check</button>
+</form>
+
+<br>
+<br>
+
+{{ form.as_p }}
+{% endblock content %}

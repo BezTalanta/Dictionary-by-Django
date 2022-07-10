@@ -4,16 +4,20 @@ from django.db import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from .models import CATEGORY_CHOICE, RunSettings, RunWord, Word, DictionarySetting
 from django import views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.db.models import F, Q
 from django.db import connection
 
+from .forms import WordForm
+from .models import CATEGORY_CHOICE, RunSettings, RunWord, Word, DictionarySetting
+
+
 ENGLISH_COLUMN = 5
 TRANSCRIPTION_COLUMN = 2
 TRANSLATION_COLUMN = 5
+
 
 class WordListView(LoginRequiredMixin, views.View):
     def get(self, request):
@@ -24,16 +28,16 @@ class WordListView(LoginRequiredMixin, views.View):
             SearchDefault = request.POST['SearchField']
             Words = Words.filter(english__icontains=SearchDefault)
         return render(request, 'dict/list.html',
-            {'words': Words,
-             'SearchDefault': SearchDefault,
-             'hf_english_col': ENGLISH_COLUMN - \
-                current_setting.category - \
-                current_setting.favourite,
-             'hf_tnscrp_col': TRANSCRIPTION_COLUMN,
-             'hf_trnslt_col': TRANSLATION_COLUMN - current_setting.note,
-             'hf_category': current_setting.category,
-             'hf_favor': current_setting.favourite,
-             'hf_note': current_setting.note})
+                      {'words': Words,
+                       'SearchDefault': SearchDefault,
+                       'hf_english_col': ENGLISH_COLUMN -
+                                         current_setting.category -
+                                         current_setting.favourite,
+                       'hf_tnscrp_col': TRANSCRIPTION_COLUMN,
+                       'hf_trnslt_col': TRANSLATION_COLUMN - current_setting.note,
+                       'hf_category': current_setting.category,
+                       'hf_favor': current_setting.favourite,
+                       'hf_note': current_setting.note})
 
     def post(self, request):
         current_setting = DictionarySetting.objects.get(user=request.user)
@@ -57,12 +61,12 @@ class AddWordView(views.View):
         english = request.POST['english']
         trnslt = request.POST['translation']
         if len(english) == 0 or len(trnslt) == 0:
-            return render(request, 'dict/add_page.html', \
-                {'err': 'English word and translation cannot be empty!'})
+            return render(request, 'dict/add_page.html',
+                          {'err': 'English word and translation cannot be empty!'})
 
         trnscrp = request.POST.get('transcription', '')
         category = request.POST['category']
-        note=request.POST.get('note', '')
+        note = request.POST.get('note', '')
         isf = False
         if request.POST.get('is_favourite', False):
             isf = True
@@ -79,8 +83,8 @@ class AddWordView(views.View):
             w.set_original_translation(trnslt)
             w.save()
         except:
-            return render(request, 'dict/add_page.html',
-                {'err': f'Word {english} is already exist!'})
+            return render(request, 'dict/add_page.html', \
+                          {'err': f'Word {english} is already exist!'})
         if request.POST.get('multiple', False):
             return render(request, 'dict/add_page.html', {'multiple_check': 'Yeah'})
         return redirect('dict-list')
@@ -95,7 +99,7 @@ class DetailWordView(views.View):
         return render(request, 'dict/detail_page.html', {
             'word': Word.objects.get(id=id),
             'back_href': back_href,
-            })
+        })
 
     def post(self, request, id):
         if request.POST['Button'] == 'Update':
@@ -104,7 +108,8 @@ class DetailWordView(views.View):
             w.transcription = request.POST['transcription']
             w.translation = request.POST['translation']
             w.category = CATEGORY_CHOICE[int(request.POST['category'])][1]
-            w.favourite = True if request.POST.get('favourite', False) else False
+            w.favourite = True if request.POST.get(
+                'favourite', False) else False
             w.note = request.POST['note']
             try:
                 w.save()
@@ -112,7 +117,7 @@ class DetailWordView(views.View):
                 return render(request, 'dict/detail_page.html', {
                     'word': Word.objects.get(id=id),
                     'err': f"{request.POST['english']} is already exists in your dictionary",
-                    })
+                })
         else:
             Word.objects.get(id=id).delete()
         return redirect(reverse('dict-list'))
@@ -136,6 +141,7 @@ class ModelRunView(LoginRequiredMixin, views.View):
             4) endless
             5) answer
     '''
+
     def get(self, request):
         get_user_settings = RunSettings.objects.filter(user=request.user)
         if get_user_settings:
@@ -152,7 +158,7 @@ class ModelRunView(LoginRequiredMixin, views.View):
                             b_count += 1
                     return render(request, 'dict/run_word_end_page.html', {
                         'good_words_count': g_count,
-                        'wrong_words_count' : b_count,
+                        'wrong_words_count': b_count,
                         'all_words_count': g_count + b_count,
                         'data': all_words,
                     })
@@ -168,14 +174,14 @@ class ModelRunView(LoginRequiredMixin, views.View):
                 show_type = 'w' if random.randint(0, 1) else 't'
             if show_type == 'w' or len(get_word.word.transcription) == 0:
                 return render(request, 'dict/run_word_page.html', {
-                        'output': get_word.word.english,
-                        }
-                    )
+                    'output': get_word.word.english,
+                }
+                )
             else:
                 return render(request, 'dict/run_word_page.html', {
-                        'output': get_word.word.transcription,
-                        }
-                    )
+                    'output': get_word.word.transcription,
+                }
+                )
         return render(request, 'dict/run_page.html')
 
     def post(self, request):
@@ -183,18 +189,22 @@ class ModelRunView(LoginRequiredMixin, views.View):
             RunSettings.objects.create(
                 user=request.user,
                 show_type=request.POST['options'],
-                is_endless=True if request.POST.get('Endless', False) else False,
-                is_answer_menu=True if request.POST.get('Answer', False) else False
+                is_endless=True if request.POST.get(
+                    'Endless', False) else False,
+                is_answer_menu=True if request.POST.get(
+                    'Answer', False) else False
             )
             category = request.POST['Category']
-            use_favourite = True if request.POST.get('Favourite', False) else False
+            use_favourite = True if request.POST.get(
+                'Favourite', False) else False
             data = Word.objects.filter(user=request.user)
             if category != 'all':
                 if use_favourite:
                     data = data.filter(
                         Q(category=CATEGORY_CHOICE[int(category)][1]) | Q(favourite=True))
                 else:
-                    data = data.filter(category=CATEGORY_CHOICE[int(category)][1])
+                    data = data.filter(
+                        category=CATEGORY_CHOICE[int(category)][1])
             shuffle_list = [i for i in range(data.count())]
             random.shuffle(shuffle_list)
             for index in shuffle_list:
@@ -203,7 +213,7 @@ class ModelRunView(LoginRequiredMixin, views.View):
                     word=data[index]
                 )
         elif request.POST.get('button', False) != False and \
-            request.POST['button'] == 'Check':
+                request.POST['button'] == 'Check':
             rs = RunWord.manager.get_first_active(request.user)
             answer_map = rs.check_translation(request.POST['input'])
             rs.user_answer = request.POST['input']
@@ -219,17 +229,19 @@ class ModelRunView(LoginRequiredMixin, views.View):
                     **answer_map,
                 })
         elif request.POST.get('button', False) != False and \
-            request.POST['button'] == 'start new':
+                request.POST['button'] == 'start new':
             RunWord.manager.get_user_words(request.user).delete()
             RunSettings.objects.filter(user=request.user).delete()
         elif request.POST.get('button', False) != False and \
-            request.POST['button'] == 'end training':
-            RunSettings.objects.filter(user=request.user).update(is_endless=False)
+                request.POST['button'] == 'end training':
+            RunSettings.objects.filter(
+                user=request.user).update(is_endless=False)
             for word in RunWord.manager.get_user_words(request.user):
                 word.active_status = False
                 word.save()
         elif request.POST.get('english_word', False) != False:
-            word = RunWord.manager.get(Q(word__english=request.POST['english_word']), Q(user=request.user))
+            word = RunWord.manager.get(
+                Q(word__english=request.POST['english_word']), Q(user=request.user))
             return render(request, 'dict/run_word_result_page.html', {
                 'global_right': word.answer_status,
                 'output': word.word.english,
@@ -237,12 +249,27 @@ class ModelRunView(LoginRequiredMixin, views.View):
                 'word': word.word,
                 **word.check_translation(word.user_answer),
             })
-        elif request.POST.get('go_to_detail', False) != False:
+        elif request.POST.get('go_to_detail', False) is not False:
             return redirect(reverse('detail-word',
-                kwargs={
-                        'id': Word.objects.get(
-                            Q(english=request.POST['go_to_detail']) & Q(user=request.user)).pk
-                    }
-                )
-            )
+                                    kwargs={
+                                        'id': Word.objects.get(
+                                            Q(english=
+                                              request.POST['go_to_detail']) &
+                                            Q(user=request.user)).pk
+                                    }
+                                    )
+                            )
         return redirect(reverse('run'))
+
+
+class TestForms(views.View):
+    def get(self, request):
+        return render(request, 'dict/test_form_page.html', {
+            'form': WordForm(),
+        })
+
+    def post(self, request):
+        f = WordForm(request.POST, initial={'user': request.user})
+        return render(request, 'dict/test_form_page.html', {
+            'form': f,
+        })

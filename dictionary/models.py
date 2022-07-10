@@ -13,38 +13,57 @@ CATEGORY_CHOICE = (
 
 
 class Word(models.Model):
+    '''
+        user *
+        english
+        transcription
+        translation
+        pure_translation *
+        note
+        favourite
+        category
+    '''
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='dictionary'
     )
+
     english = models.CharField(
         max_length=100,
         verbose_name='Английское слово',
     )
+
     transcription = models.CharField(
         max_length=100,
-        verbose_name='Транскрипция'
+        verbose_name='Транскрипция',
+        blank=True,
+        null=True,
     )
+
     translation = models.CharField(
         max_length=200,
         verbose_name='Перевод'
     )
+
     pure_translation = models.CharField(
         'Чистый перевод',
         max_length=200,
         default=''
     )
+
     note = models.CharField(
         max_length=100,
         verbose_name='Заметка',
         blank=True,
         null=True,
     )
+
     favourite = models.BooleanField(
         default=False,
         verbose_name='Избранное ли слово'
     )
+
     category = models.CharField(
         max_length=5,
         choices=CATEGORY_CHOICE,
@@ -110,7 +129,7 @@ class RunSettings(models.Model):
 
     def __str__(self):
         return \
-        f"{self.user}'s setting, created {self.start_time}, with show type: {self.show_type}, endless? {self.is_endless}, answer? {self.is_answer_menu}"
+            f"{self.user}'s setting, created {self.start_time}, with show type: {self.show_type}, endless? {self.is_endless}, answer? {self.is_answer_menu}"
 
 
 class RunWordManager(models.Manager):
@@ -125,8 +144,10 @@ class RunWord(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     word = models.ForeignKey(Word, on_delete=models.CASCADE)
     active_status = models.BooleanField('Появилось ли слово', default=True)
-    answer_status = models.BooleanField('Статус правильности ответа', default=False)
-    user_answer = models.CharField('Ответ пользователя', max_length=200, default='')
+    answer_status = models.BooleanField(
+        'Статус правильности ответа', default=False)
+    user_answer = models.CharField(
+        'Ответ пользователя', max_length=200, default='')
     manager = RunWordManager()
 
     def check_translation(self, user_translation):
@@ -136,7 +157,7 @@ class RunWord(models.Model):
         is_word_exists_with_zero, is_zero_priority_was = False, False
         is_result_right = True
         for word, priority in right_translation_map.items():
-            if priority == 0: # If priority 0 you can get only Wrong or one True
+            if priority == 0:  # If priority 0 you can get only Wrong or one True
                 is_word_exists_with_zero = True
                 if user_translation_map.get(word, 'Not found') != 'Not found':
                     is_zero_priority_was = True
@@ -144,21 +165,22 @@ class RunWord(models.Model):
                     del user_translation_map[word]
                 else:
                     zero_p[word] = 0
-            elif priority == 1: # If priority 1 you can get only True or Wrong
+            elif priority == 1:  # If priority 1 you can get only True or Wrong
                 if user_translation_map.get(word, 'Not found') != 'Not found':
-                    one_p[word] = 1 # Only True
+                    one_p[word] = 1  # Only True
                     del user_translation_map[word]
                 else:
                     is_result_right = False
-                    one_p[word] = -1 # Only Wrong
-            else: # If priority -1 you can get only True or nothing
+                    one_p[word] = -1  # Only Wrong
+            else:  # If priority -1 you can get only True or nothing
                 if user_translation_map.get(word, 'Not found') != 'Not found':
                     n_one_p[word] = 1
                     del user_translation_map[word]
                 else:
                     n_one_p[word] = 0
         bad_user_input = [word for word in user_translation_map.keys()]
-        result_right = (is_word_exists_with_zero == False or is_zero_priority_was) and is_result_right
+        result_right = (is_word_exists_with_zero ==
+                        False or is_zero_priority_was) and is_result_right
         return {
             'is_zero_right': is_zero_priority_was,
             'zero_map': zero_p,
@@ -168,11 +190,9 @@ class RunWord(models.Model):
             'global_right': result_right,
         }
 
-
     def get_user_words(request):
         ''' Using to get all current user's words '''
         return RunWord.objects.filter(user=request.user)
 
     def __str__(self):
         return f"{self.user}'s word - {self.word}"
-
